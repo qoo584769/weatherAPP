@@ -582,7 +582,7 @@ onMounted(async () => {
 
 <template>
   <div class="h-screen w-full bg-no-repeat overflow-auto" :class="bgSelector">
-    <div class="flex w-full h-full bg-black/[.1]">
+    <div class="flex w-full h-max md:h-screen bg-black/[.1]">
       <div class="w-full max-w-[1200px] h-fit m-auto flex flex-col text-center">
         <div
           class="m-4 bg-black/[.05] shadow-[0_0_10px_rgba(255,255,255,0.1)] border-2 border-white/[.1] backdrop-blur text-white py-5 md:p-5 md:m-0 md:mb-10 rounded-3xl"
