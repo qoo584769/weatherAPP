@@ -1,6 +1,6 @@
 <script setup>
+import { onMounted, ref, computed, watch } from 'vue'
 import axios from 'axios'
-import { onMounted, ref, computed } from 'vue'
 import precipIcon from './assets/icons/precip-icon.svg'
 import mostlyCloudyNight from './assets/icons/mostly-cloudy-night.svg'
 import mostlyCloudy from './assets/icons/mostly-cloudy.svg'
@@ -10,6 +10,124 @@ import partlyCloudy from './assets/icons/partly-cloudy.svg'
 import mostlyCloudyShower from './assets/icons/mostly-cloudy-shower.svg'
 import thunderstorm from './assets/icons/thunderstorm.svg'
 import rain from './assets/icons/rain.svg'
+
+const radioCheck = ref(false)
+
+const citys = ref([
+  {
+    name: '基隆市',
+    stationId: 466940,
+    cityId: 312605,
+  },
+  {
+    name: '臺北市',
+    stationId: 466920,
+    cityId: 315078,
+  },
+  {
+    name: '新北市',
+    stationId: 466881,
+    cityId: 2515397,
+  },
+  {
+    name: '桃園縣',
+    stationId: 467050,
+    cityId: 3369297,
+  },
+  {
+    name: '新竹市',
+    stationId: 'C0D660',
+    cityId: 313567,
+  },
+  {
+    name: '新竹縣',
+    stationId: 467571,
+    cityId: 3369298,
+  },
+  {
+    name: '苗栗縣',
+    stationId: 467280,
+    cityId: 3369299,
+  },
+  {
+    name: '臺中市',
+    stationId: 467490,
+    cityId: 315040,
+  },
+  {
+    name: '彰化縣',
+    stationId: 467270,
+    cityId: 3369300,
+  },
+  {
+    name: '南投縣',
+    stationId: 467650,
+    cityId: 3369301,
+  },
+  {
+    name: '雲林縣',
+    stationId: 'C0K330',
+    cityId: 3369302,
+  },
+  {
+    name: '嘉義市',
+    stationId: 467480,
+    cityId: 312591,
+  },
+  {
+    name: '嘉義縣',
+    stationId: 467530,
+    cityId: 3369303,
+  },
+  {
+    name: '臺南市',
+    stationId: 467410,
+    cityId: 314999,
+  },
+  {
+    name: '高雄市',
+    stationId: 467441,
+    cityId: 313812,
+  },
+  {
+    name: '屏東縣',
+    stationId: 467590,
+    cityId: 3369304,
+  },
+  {
+    name: '臺東縣',
+    stationId: 467660,
+    cityId: 3369305,
+  },
+  {
+    name: '花蓮縣',
+    stationId: 466990,
+    cityId: 3369306,
+  },
+  {
+    name: '宜蘭縣',
+    stationId: 467080,
+    cityId: 3369296,
+  },
+  {
+    name: '澎湖縣',
+    stationId: 467350,
+    cityId: 3369307,
+  },
+  {
+    name: '金門縣',
+    stationId: 467110,
+    cityId: 2332525,
+  },
+  {
+    name: '連江縣',
+    stationId: 467990,
+    cityId: 2332501,
+  },
+])
+const cityActive = ref('')
+const cityStationId = ref('')
+const cityId = ref('')
 
 const bgWeather = ref({
   雨天: "bg-[url('./assets/image/bg-rain.jpg')]",
@@ -483,15 +601,26 @@ const slide = (direction) => {
   }
 }
 
-const currentWeatherAPI = async (StationName = '臺北') => {
+const toggle = () => {
+  radioCheck.value = !radioCheck.value
+}
+
+const currentWeatherAPI = async (StationId = 466920) => {
   try {
-    const response = await axios.get(
-      `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${
+    let url = ''
+    if (StationId === 'C0D660' || StationId === 'C0K330') {
+      url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=${
         import.meta.env.VITE_API_KEY
-      }&StationName=${StationName}`
-    )
+      }&StationId=${StationId}`
+    } else {
+      url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${
+        import.meta.env.VITE_API_KEY
+      }&StationId=${StationId}`
+    }
+    const response = await axios.get(url)
     const weatherData = response.data.records.Station[0]
-    return weatherData
+    currentWeather.value = weatherData
+    toggle()
   } catch (error) {
     console.log('取得及時天氣失敗')
     console.log(error)
@@ -505,7 +634,7 @@ const hourlyWeatherAPI = async () => {
         import.meta.env.VITE_ACCUWEATHER_API_KEY
       }&language=zh-tw&metric=true`
     )
-    return resHourly.data
+    hourlyWeather.value = resHourly.data
   } catch (error) {
     console.log('取得每小時天氣失敗')
     console.log(error)
@@ -525,13 +654,19 @@ const dailyWeatherAPI = async (lat = 25.033493, lon = 121.564101) => {
       import.meta.env.VITE_ACCUWEATHER_API_KEY
     }&language=zh-tw&metric=true`
     const resDaily = await axios.get(url)
-    return resDaily.data.DailyForecasts
+    futureForecasts.value = resDaily.data.DailyForecasts
     // return resDaily.data.daily.data
   } catch (error) {
     console.log('取得每日天氣失敗')
     console.log(error)
   }
 }
+
+watch(cityActive, (newCity) => {
+  const newArr = citys.value.filter((item) => item.name === newCity)
+  cityStationId.value = newArr[0].stationId
+  cityId.value = newArr[0].cityId
+})
 
 const bgSelector = computed(() => {
   return (
@@ -569,11 +704,11 @@ const featureDayWeather = computed(() => {
 onMounted(async () => {
   try {
     // 現在資料
-    currentWeather.value = await currentWeatherAPI()
+    await currentWeatherAPI()
     // 每小時資料
-    hourlyWeather.value = await hourlyWeatherAPI()
+    await hourlyWeatherAPI()
     // 每日資料
-    futureForecasts.value = await dailyWeatherAPI()
+    await dailyWeatherAPI()
   } catch (error) {
     console.log(error)
   }
@@ -583,7 +718,44 @@ onMounted(async () => {
 <template>
   <div class="h-screen w-full bg-no-repeat overflow-auto" :class="bgSelector">
     <div class="flex w-full h-max md:h-screen bg-black/[.1]">
-      <div class="w-full max-w-[1200px] h-fit m-auto flex flex-col text-center">
+      <div
+        class="relative w-full max-w-[1200px] overflow-hidden h-fit m-auto flex flex-col text-center"
+      >
+        <input
+          type="checkbox"
+          name=""
+          id="menu_control"
+          :checked="radioCheck"
+          class="hidden"
+        />
+        <label
+          class="w-10 h-10 overflow-hidden rounded-[10px] backdrop-blur bg-white/[.02] absolute z-10 right-8 top-8 md:right-4 md:top-4 after:content-[''] after:w-8 after:h-[2px] after:px-2 after:overflow-hidden after:bg-white/[.7] after:absolute after:top-0 after:bottom-0 after:left-0 after:right-0 after:m-auto after:shadow-[0px_-8px_0_rgba(255,255,255,0.7)] before:content-[''] before:w-5 before:h-[2px] before:absolute before:top-0 before:bottom-0 before:right-1 before:m-auto before:bg-white/[.01] before:shadow-[0px_8px_0_rgba(255,255,255,0.7)]"
+          for="menu_control"
+          @click="toggle"
+        ></label>
+        <div
+          class="border rounded-xl h-16 md:h-12 absolute w-full right-0 z-10 overflow-hidden afer:content-['\25BC'] after:absolute after:top-0 after:right-0 after: after:bg-[#34495e] flex md:w-fit"
+          :class="[radioCheck ? 'translate-x-full' : 'translate-x-0']"
+        >
+          <select
+            name=""
+            id=""
+            v-model="cityActive"
+            class="appearance-none outline-none px-10 flex-1"
+            @change="currentWeatherAPI(cityStationId)"
+          >
+            <option disabled value="" class="">請選擇縣市</option>
+            <option
+              v-for="city in citys"
+              :key="city.name"
+              :value="city.name"
+              class="appearance-none"
+            >
+              {{ city.name }}
+            </option>
+          </select>
+        </div>
+
         <div
           class="m-4 bg-black/[.05] shadow-[0_0_10px_rgba(255,255,255,0.1)] border-2 border-white/[.1] backdrop-blur text-white py-5 md:p-5 md:m-0 md:mb-10 rounded-3xl"
         >
