@@ -76,7 +76,7 @@ const citys = ref([
   },
   {
     name: '嘉義縣',
-    stationId: 467530,
+    stationId: 'C0M790',
     cityId: 3369303,
   },
   {
@@ -611,7 +611,8 @@ const toggle = () => {
 const currentWeatherAPI = async (StationId = 466920) => {
   try {
     let url = ''
-    if (StationId === 'C0D660' || StationId === 'C0K330') {
+    const autoStationId = ['C0D660', 'C0K330', 'C0M790']
+    if (autoStationId.includes(StationId)) {
       url = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0001-001?Authorization=${
         import.meta.env.VITE_API_KEY
       }&StationId=${StationId}`
@@ -803,9 +804,18 @@ onMounted(async () => {
           >
             <div class="flex flex-col items-center">
               <span class="">紫外線</span>
-              <span class=""
-                >{{ currentWeather.WeatherElement.UVIndex }} UVI</span
-              >
+              <span class="">
+                {{
+                  currentWeather.WeatherElement.UVIndex !== undefined
+                    ? currentWeather.WeatherElement.UVIndex
+                    : '無資料'
+                }}
+                <span class="">{{
+                  currentWeather.WeatherElement.UVIndex !== undefined
+                    ? 'UVI'
+                    : ''
+                }}</span>
+              </span>
             </div>
             <div class="border-r"></div>
             <div class="flex flex-col items-center">
@@ -826,10 +836,13 @@ onMounted(async () => {
               <span class="">能見度</span>
               <span class=""
                 >{{
-                  currentWeather.WeatherElement.VisibilityDescription
+                  currentWeather.WeatherElement.VisibilityDescription ||
+                  '無資料'
                 }}
-                m</span
-              >
+                <span class="">{{
+                  currentWeather.WeatherElement.VisibilityDescription && 'm'
+                }}</span>
+              </span>
             </div>
             <div class="border-r"></div>
             <div class="flex flex-col items-center">
