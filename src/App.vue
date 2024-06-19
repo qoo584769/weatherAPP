@@ -16,6 +16,7 @@ import partlyCloudy from './assets/icons/partly-cloudy.svg'
 import mostlyCloudyShower from './assets/icons/mostly-cloudy-shower.svg'
 import thunderstorm from './assets/icons/thunderstorm.svg'
 import rain from './assets/icons/rain.svg'
+import sunny from './assets/icons/sunny.svg'
 
 const bgWeather = ref({
   雨天: "bg-[url('./assets/image/bg-rain.jpg')]",
@@ -27,10 +28,16 @@ const bgWeather = ref({
   陰有靄: "bg-[url('./assets/image/bg-foggy.jpg')]",
 })
 const weatherIcon = ref({
+  晴朗: sunny,
   偶雲: partlyCloudy,
+  大部晴朗: partlyCloudy,
+  '晴時多雲，轉多雲': partlyCloudy,
   多雲: mostlyCloudy,
+  多雲時陰: mostlyCloudy,
+  雲層多變: mostlyCloudy,
   陣雨: mostlyCloudyShower,
   有雷雨: thunderstorm,
+  多場雷雨: thunderstorm,
   多雲時陰有雷雨: thunderstorm,
   陰: overcast,
   雨: rain,

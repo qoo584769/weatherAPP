@@ -113,7 +113,8 @@ const slide = (direction) => {
 
 const currentForecasts = computed(() => {
   hourlyWeather.value.forEach((item, index) => {
-    item.WeatherIcon = weatherIcon.value[item.IconPhrase]
+    item.WeatherIcon =
+      weatherIcon.value[item.IconPhrase] || weatherIcon.value['偶雲']
   })
   const start = currentIndex.value
   const end = start + 6

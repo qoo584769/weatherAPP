@@ -70,7 +70,8 @@ const weatherIcon = ref(props.weatherIcon)
 const featureDayWeather = computed(() => {
   let data = []
   futureForecasts.value.forEach((item, index) => {
-    item.Day.Icon = weatherIcon.value[item.Day.IconPhrase]
+    item.Day.Icon =
+      weatherIcon.value[item.Day.IconPhrase] || weatherIcon.value['偶雲']
     data.push(item)
   })
   return data
