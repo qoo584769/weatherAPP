@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed, watch, nextTick } from 'vue'
 import axios from 'axios'
 
 import CitySelect from './components/CitySelect.vue'
@@ -31,7 +31,10 @@ const weatherIcon = ref({
   多雲: mostlyCloudy,
   陣雨: mostlyCloudyShower,
   有雷雨: thunderstorm,
+  多雲時陰有雷雨: thunderstorm,
   陰: overcast,
+  雨: rain,
+  有雨: rain,
 })
 // 及時天氣
 const currentWeather = ref({

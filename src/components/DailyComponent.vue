@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   futureForecasts: {
@@ -75,6 +75,14 @@ const featureDayWeather = computed(() => {
   })
   return data
 })
+
+watch(
+  () => props.futureForecasts,
+  (newData) => {
+    futureForecasts.value = newData
+  },
+  { deep: true }
+)
 </script>
 
 <style lang="scss" scoped></style>

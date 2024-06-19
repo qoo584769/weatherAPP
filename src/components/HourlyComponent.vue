@@ -86,7 +86,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   hourlyWeather: {
@@ -100,7 +100,6 @@ const props = defineProps({
 })
 const hourlyWeather = ref(props.hourlyWeather)
 const weatherIcon = ref(props.weatherIcon)
-
 const currentIndex = ref(0)
 const numForecasts = hourlyWeather.value.length
 
@@ -128,6 +127,14 @@ const currentForecasts = computed(() => {
     ]
   }
 })
+
+watch(
+  () => props.hourlyWeather,
+  (newData) => {
+    hourlyWeather.value = newData
+  },
+  { deep: true }
+)
 </script>
 
 <style lang="scss" scoped></style>
