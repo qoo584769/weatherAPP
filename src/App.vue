@@ -737,7 +737,7 @@ onMounted(async () => {
           @click="toggle"
         ></label>
         <div
-          class="border rounded-xl h-16 md:h-12 absolute w-full right-0 z-10 overflow-hidden afer:content-['\25BC'] after:absolute after:top-0 after:right-0 after: after:bg-[#34495e] flex md:w-fit"
+          class="border rounded-xl h-16 md:h-12 absolute w-full right-0 z-10 overflow-hidden afer:content-['\25BC'] after:absolute after:top-0 after:right-0 after: after:bg-[#34495e] flex md:w-fit transition-transform ease-in-out duration-300"
           :class="[radioCheck ? 'translate-x-full' : 'translate-x-0']"
         >
           <select
@@ -765,8 +765,9 @@ onMounted(async () => {
           <div class="text-5xl mb-4">
             {{ currentWeather?.WeatherElement?.AirTemperature }} °C
           </div>
+
           <div
-            class="text-3xl font-semibold mb-4 flex items-center justify-center"
+            class="text-3xl font-semibold mb-2 md:mb-4 flex items-center justify-center"
           >
             <span class="pr-4 border-r-[1px] border-white/[.5]">
               {{ currentWeather?.GeoInfo.CountyName }}
@@ -782,17 +783,19 @@ onMounted(async () => {
               {{ currentWeather?.WeatherElement?.Weather }}
             </span>
           </div>
-          <div class="flex fle-col items-center justify-center mb-3"></div>
-          <div class="hidden">
-            <span class=""
-              >H:{{
+
+          <div class="mb-2 md:mb-4">
+            <span class="p-4"
+              >H :
+              {{
                 currentWeather.WeatherElement.DailyExtreme.DailyHigh
                   ?.TemperatureInfo?.AirTemperature
               }}
               °C</span
             >
-            <span class=""
-              >L:{{
+            <span class="p-4"
+              >L :
+              {{
                 currentWeather.WeatherElement.DailyExtreme.DailyLow
                   ?.TemperatureInfo?.AirTemperature
               }}
