@@ -125,8 +125,11 @@ const citys = ref([
     cityId: 2332501,
   },
 ])
+// 選擇的地點
 const cityActive = ref('')
+// 氣象局的站點ID
 const cityStationId = ref('')
+// accuweather的地點ID
 const cityId = ref('')
 
 const bgWeather = ref({
@@ -655,7 +658,6 @@ const dailyWeatherAPI = async (lat = 25.033493, lon = 121.564101) => {
     }&language=zh-tw&metric=true`
     const resDaily = await axios.get(url)
     futureForecasts.value = resDaily.data.DailyForecasts
-    // return resDaily.data.daily.data
   } catch (error) {
     console.log('取得每日天氣失敗')
     console.log(error)
@@ -957,7 +959,7 @@ onMounted(async () => {
                     <div class="mr-1">
                       <img
                         :src="dailyForecast.Day.Icon"
-                        :alt="dailyForecast.description"
+                        :alt="dailyForecast.Day.IconPhrase"
                         class="w-8 h-8"
                       />
                     </div>
