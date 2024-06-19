@@ -1,6 +1,12 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue'
 import axios from 'axios'
+
+import CitySelect from './components/CitySelect.vue'
+import CurrentWeatherComponent from './components/CurrentWeatherComponent.vue'
+import HourlyComponent from './components/HourlyComponent.vue'
+import DailyComponent from './components/DailyComponent.vue'
+
 import precipIcon from './assets/icons/precip-icon.svg'
 import mostlyCloudyNight from './assets/icons/mostly-cloudy-night.svg'
 import mostlyCloudy from './assets/icons/mostly-cloudy.svg'
@@ -10,127 +16,6 @@ import partlyCloudy from './assets/icons/partly-cloudy.svg'
 import mostlyCloudyShower from './assets/icons/mostly-cloudy-shower.svg'
 import thunderstorm from './assets/icons/thunderstorm.svg'
 import rain from './assets/icons/rain.svg'
-
-const radioCheck = ref(false)
-
-const citys = ref([
-  {
-    name: '基隆市',
-    stationId: 466940,
-    cityId: 312605,
-  },
-  {
-    name: '臺北市',
-    stationId: 466920,
-    cityId: 315078,
-  },
-  {
-    name: '新北市',
-    stationId: 466881,
-    cityId: 2515397,
-  },
-  {
-    name: '桃園縣',
-    stationId: 467050,
-    cityId: 3369297,
-  },
-  {
-    name: '新竹市',
-    stationId: 'C0D660',
-    cityId: 313567,
-  },
-  {
-    name: '新竹縣',
-    stationId: 467571,
-    cityId: 3369298,
-  },
-  {
-    name: '苗栗縣',
-    stationId: 467280,
-    cityId: 3369299,
-  },
-  {
-    name: '臺中市',
-    stationId: 467490,
-    cityId: 315040,
-  },
-  {
-    name: '彰化縣',
-    stationId: 467270,
-    cityId: 3369300,
-  },
-  {
-    name: '南投縣',
-    stationId: 467650,
-    cityId: 3369301,
-  },
-  {
-    name: '雲林縣',
-    stationId: 'C0K330',
-    cityId: 3369302,
-  },
-  {
-    name: '嘉義市',
-    stationId: 467480,
-    cityId: 312591,
-  },
-  {
-    name: '嘉義縣',
-    stationId: 'C0M790',
-    cityId: 3369303,
-  },
-  {
-    name: '臺南市',
-    stationId: 467410,
-    cityId: 314999,
-  },
-  {
-    name: '高雄市',
-    stationId: 467441,
-    cityId: 313812,
-  },
-  {
-    name: '屏東縣',
-    stationId: 467590,
-    cityId: 3369304,
-  },
-  {
-    name: '臺東縣',
-    stationId: 467660,
-    cityId: 3369305,
-  },
-  {
-    name: '花蓮縣',
-    stationId: 466990,
-    cityId: 3369306,
-  },
-  {
-    name: '宜蘭縣',
-    stationId: 467080,
-    cityId: 3369296,
-  },
-  {
-    name: '澎湖縣',
-    stationId: 467350,
-    cityId: 3369307,
-  },
-  {
-    name: '金門縣',
-    stationId: 467110,
-    cityId: 2332525,
-  },
-  {
-    name: '連江縣',
-    stationId: 467990,
-    cityId: 2332501,
-  },
-])
-// 選擇的地點
-const cityActive = ref('')
-// 氣象局的站點ID
-const cityStationId = ref('')
-// accuweather的地點ID
-const cityId = ref('')
 
 const bgWeather = ref({
   雨天: "bg-[url('./assets/image/bg-rain.jpg')]",
@@ -593,21 +478,6 @@ const hourlyWeather = ref([
   },
 ])
 
-const currentIndex = ref(0)
-const numForecasts = hourlyWeather.value.length
-
-const slide = (direction) => {
-  if (direction === 'left') {
-    currentIndex.value = (currentIndex.value - 1 + numForecasts) % numForecasts
-  } else if (direction === 'right') {
-    currentIndex.value = (currentIndex.value + 1) % numForecasts
-  }
-}
-
-const toggle = () => {
-  radioCheck.value = !radioCheck.value
-}
-
 const currentWeatherAPI = async (StationId = 466920) => {
   try {
     let url = ''
@@ -624,17 +494,16 @@ const currentWeatherAPI = async (StationId = 466920) => {
     const response = await axios.get(url)
     const weatherData = response.data.records.Station[0]
     currentWeather.value = weatherData
-    toggle()
   } catch (error) {
     console.log('取得及時天氣失敗')
     console.log(error)
   }
 }
 
-const hourlyWeatherAPI = async () => {
+const hourlyWeatherAPI = async (cityId = 315078) => {
   try {
     const resHourly = await axios.get(
-      `https://dataservice.accuweather.com/forecasts/v1/hourly/12hour/315078?apikey=${
+      `https://dataservice.accuweather.com/forecasts/v1/hourly/12hour/${cityId}?apikey=${
         import.meta.env.VITE_ACCUWEATHER_API_KEY
       }&language=zh-tw&metric=true`
     )
@@ -645,7 +514,7 @@ const hourlyWeatherAPI = async () => {
   }
 }
 
-const dailyWeatherAPI = async (lat = 25.033493, lon = 121.564101) => {
+const dailyWeatherAPI = async (cityId = 315078) => {
   try {
     const config = {
       // Headers: {
@@ -654,7 +523,7 @@ const dailyWeatherAPI = async (lat = 25.033493, lon = 121.564101) => {
       // },
     }
     // const url = `https://ai-weather-by-meteosource.p.rapidapi.com/daily?lat=${lat}&lon=${lon}&language=en&units=metric`
-    const url = `https://dataservice.accuweather.com/forecasts/v1/daily/5day/315078?apikey=${
+    const url = `https://dataservice.accuweather.com/forecasts/v1/daily/5day/${cityId}?apikey=${
       import.meta.env.VITE_ACCUWEATHER_API_KEY
     }&language=zh-tw&metric=true`
     const resDaily = await axios.get(url)
@@ -665,43 +534,11 @@ const dailyWeatherAPI = async (lat = 25.033493, lon = 121.564101) => {
   }
 }
 
-watch(cityActive, (newCity) => {
-  const newArr = citys.value.filter((item) => item.name === newCity)
-  cityStationId.value = newArr[0].stationId
-  cityId.value = newArr[0].cityId
-})
-
 const bgSelector = computed(() => {
   return (
     bgWeather.value[currentWeather.value?.WeatherElement?.Weather] ||
     "bg-[url('./assets/image/bg-overcast.jpg')]"
   )
-})
-
-const currentForecasts = computed(() => {
-  hourlyWeather.value.forEach((item, index) => {
-    item.WeatherIcon = weatherIcon.value[item.IconPhrase]
-  })
-  const start = currentIndex.value
-  const end = start + 6
-  if (end <= numForecasts) {
-    return hourlyWeather.value.slice(start, end)
-  } else {
-    const remaining = end - numForecasts
-    return [
-      ...hourlyWeather.value.slice(start),
-      ...hourlyWeather.value.slice(0, remaining),
-    ]
-  }
-})
-
-const featureDayWeather = computed(() => {
-  let data = []
-  futureForecasts.value.forEach((item, index) => {
-    item.Day.Icon = weatherIcon.value[item.Day.IconPhrase]
-    data.push(item)
-  })
-  return data
 })
 
 onMounted(async () => {
@@ -724,271 +561,23 @@ onMounted(async () => {
       <div
         class="relative w-full max-w-[1200px] overflow-hidden h-fit m-auto flex flex-col text-center"
       >
-        <input
-          type="checkbox"
-          name=""
-          id="menu_control"
-          :checked="radioCheck"
-          class="hidden"
-        />
-        <label
-          class="w-10 h-10 overflow-hidden rounded-[10px] backdrop-blur bg-white/[.02] absolute z-10 right-8 top-8 md:right-4 md:top-4 after:content-[''] after:w-8 after:h-[2px] after:px-2 after:overflow-hidden after:bg-white/[.7] after:absolute after:top-0 after:bottom-0 after:left-0 after:right-0 after:m-auto after:shadow-[0px_-8px_0_rgba(255,255,255,0.7)] before:content-[''] before:w-5 before:h-[2px] before:absolute before:top-0 before:bottom-0 before:right-1 before:m-auto before:bg-white/[.01] before:shadow-[0px_8px_0_rgba(255,255,255,0.7)]"
-          for="menu_control"
-          @click="toggle"
-        ></label>
-        <div
-          class="border rounded-xl h-16 md:h-12 absolute w-full right-0 z-10 overflow-hidden afer:content-['\25BC'] after:absolute after:top-0 after:right-0 after: after:bg-[#34495e] flex md:w-fit transition-transform ease-in-out duration-300"
-          :class="[radioCheck ? 'translate-x-full' : 'translate-x-0']"
-        >
-          <select
-            name=""
-            id=""
-            v-model="cityActive"
-            class="appearance-none outline-none px-10 flex-1"
-            @change="currentWeatherAPI(cityStationId)"
-          >
-            <option disabled value="" class="">請選擇縣市</option>
-            <option
-              v-for="city in citys"
-              :key="city.name"
-              :value="city.name"
-              class="appearance-none"
-            >
-              {{ city.name }}
-            </option>
-          </select>
-        </div>
+        <city-select @call-cur-api="currentWeatherAPI"></city-select>
 
-        <div
-          class="m-4 bg-black/[.05] shadow-[0_0_10px_rgba(255,255,255,0.1)] border-2 border-white/[.1] backdrop-blur text-white py-5 md:p-5 md:m-0 md:mb-10 rounded-3xl"
-        >
-          <div class="text-5xl mb-4">
-            {{ currentWeather?.WeatherElement?.AirTemperature }} °C
-          </div>
-
-          <div
-            class="text-3xl font-semibold mb-2 md:mb-4 flex items-center justify-center"
-          >
-            <span class="pr-4 border-r-[1px] border-white/[.5]">
-              {{ currentWeather?.GeoInfo.CountyName }}
-            </span>
-            <img
-              :src="
-                weatherIcon[currentWeather?.WeatherElement?.Weather] || overcast
-              "
-              alt=""
-              class="w-12 h-12 ml-2 mr-1"
-            />
-            <span class="text-xl font-medium text-white/[.8]">
-              {{ currentWeather?.WeatherElement?.Weather }}
-            </span>
-          </div>
-
-          <div class="mb-2 md:mb-4">
-            <span class="p-4"
-              >H :
-              {{
-                currentWeather.WeatherElement.DailyExtreme.DailyHigh
-                  ?.TemperatureInfo?.AirTemperature
-              }}
-              °C</span
-            >
-            <span class="p-4"
-              >L :
-              {{
-                currentWeather.WeatherElement.DailyExtreme.DailyLow
-                  ?.TemperatureInfo?.AirTemperature
-              }}
-              °C</span
-            >
-          </div>
-          <div
-            class="flex md:gap-4 flex-wrap justify-evenly md:justify-around text-base md:text-lg"
-          >
-            <div class="flex flex-col items-center">
-              <span class="">紫外線</span>
-              <span class="">
-                {{
-                  currentWeather.WeatherElement.UVIndex !== undefined
-                    ? currentWeather.WeatherElement.UVIndex
-                    : '無資料'
-                }}
-                <span class="">{{
-                  currentWeather.WeatherElement.UVIndex !== undefined
-                    ? 'UVI'
-                    : ''
-                }}</span>
-              </span>
-            </div>
-            <div class="border-r"></div>
-            <div class="flex flex-col items-center">
-              <span class="">風速</span>
-              <span class=""
-                >{{ currentWeather.WeatherElement.WindSpeed }} m/s</span
-              >
-            </div>
-            <div class="border-r"></div>
-            <div class="flex flex-col items-center">
-              <span class="">濕度</span>
-              <span class=""
-                >{{ currentWeather.WeatherElement.RelativeHumidity }} %</span
-              >
-            </div>
-            <div class="border-r"></div>
-            <div class="flex flex-col items-center">
-              <span class="">能見度</span>
-              <span class=""
-                >{{
-                  currentWeather.WeatherElement.VisibilityDescription ||
-                  '無資料'
-                }}
-                <span class="">{{
-                  currentWeather.WeatherElement.VisibilityDescription && 'm'
-                }}</span>
-              </span>
-            </div>
-            <div class="border-r"></div>
-            <div class="flex flex-col items-center">
-              <span class="">降雨量</span>
-              <span class=""
-                >{{ currentWeather.WeatherElement.Now.Precipitation }} mm</span
-              >
-            </div>
-          </div>
-        </div>
+        <current-weather-component
+          :currentWeather="currentWeather"
+          :weatherIcon="weatherIcon"
+        ></current-weather-component>
 
         <div class="w-full md:flex justify-between items-end">
-          <div
-            class="mx-4 h-fit bg-black/[.05] shadow-[0_0_10px_rgba(255,255,255,0.1)] border-2 border-white/[.1] backdrop-blur p-3 md:m-0 md:p-5 rounded-3xl"
-          >
-            <h2 class="text-2xl font-bold mb-4 text-white">每小時預報</h2>
-            <div
-              class="flex justify-center items-center overflow-hidden relative"
-            >
-              <div
-                class="absolute left-0 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                @click="slide('left')"
-              >
-                <svg
-                  class="h-8 w-8 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15 19l-7-7 7-7"
-                  ></path>
-                </svg>
-              </div>
-              <div
-                class="flex gap-2 md:gap-x-4 transition-transform duration-300 ease-out"
-              >
-                <div
-                  v-for="(hourForecast, index) in currentForecasts"
-                  :key="index"
-                  class="bg-white rounded-lg p-3 shadow-md flex flex-col items-center md:p-4"
-                >
-                  <div class="text-base font-bold text-[#414141]">
-                    {{
-                      new Intl.DateTimeFormat('zh-TW', {
-                        hour: '2-digit',
-                        minute: 'numeric',
-                        weekday: 'short',
-                        hourCycle: 'h24',
-                        hour12: false,
-                      }).format(new Date(hourForecast.DateTime))
-                    }}
-                  </div>
-                  <div class="mt-2">
-                    <img
-                      :src="hourForecast.WeatherIcon"
-                      :alt="hourForecast.WeatherIcon"
-                      class="h-12 w-12"
-                    />
-                  </div>
-                  <div class="text-sm flex">
-                    <span class="">
-                      {{ hourForecast.Temperature.Value }}
-                    </span>
-                    <span class="">°C </span>
-                  </div>
-                  <div class="text-xs text-gray-500">
-                    {{ hourForecast.IconPhrase }}
-                  </div>
-                </div>
-              </div>
-              <div
-                class="absolute right-0 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                @click="slide('right')"
-              >
-                <svg
-                  class="h-8 w-8 text-gray-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M9 5l7 7-7 7"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
+          <hourly-component
+            :hourlyWeather="hourlyWeather"
+            :weatherIcon="weatherIcon"
+          ></hourly-component>
 
-          <div
-            class="m-4 bg-black/[.05] shadow-[0_0_10px_rgba(255,255,255,0.1)] border-2 border-white/[.1] backdrop-blur p-5 rounded-3xl md:m-0 md:ml-8"
-          >
-            <h2 class="text-2xl font-bold mb-4 text-white">未來五天天氣預報</h2>
-            <div class="grid grid-cols-2 md:grid-cols-1 gap-4">
-              <template
-                v-for="(dailyForecast, index) in featureDayWeather"
-                :key="index"
-              >
-                <div
-                  class="bg-white rounded-lg p-4 shadow-md flex justify-between items-center"
-                >
-                  <div class="md:mr-2">
-                    <div class="text-base md:text-lg ont-bold">
-                      {{
-                        new Intl.DateTimeFormat('zh-TW', {
-                          weekday: 'short',
-                        }).format(new Date(dailyForecast.Date))
-                      }}
-                    </div>
-                    <div class="text-[10px] text-gray-500">
-                      {{
-                        new Intl.DateTimeFormat('zh-TW', {
-                          month: '2-digit',
-                          day: '2-digit',
-                        }).format(new Date(dailyForecast.Date))
-                      }}
-                    </div>
-                  </div>
-
-                  <div class="flex items-center">
-                    <div class="mr-1">
-                      <img
-                        :src="dailyForecast.Day.Icon"
-                        :alt="dailyForecast.Day.IconPhrase"
-                        class="w-8 h-8"
-                      />
-                    </div>
-                  </div>
-                  <div class="">
-                    <div class="text-sm">
-                      {{ dailyForecast.Temperature.Maximum.Value }}°C
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </div>
+          <daily-component
+            :futureForecasts="futureForecasts"
+            :weatherIcon="weatherIcon"
+          ></daily-component>
         </div>
       </div>
     </div>
