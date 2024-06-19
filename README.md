@@ -1,7 +1,17 @@
-# Vue 3 + Vite
+## 簡介
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+提供一個線上 `天氣觀測` 的網頁應用程式
 
-## Recommended IDE Setup
+[Live Demo](https://qoo584769.github.io/weatherAPP/dist/index.html)
 
-- [VS Code](https://code.visualstudio.com/) + [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (previously Volar) and disable Vetur
+## 主要功能
+
+- 查看目前天氣
+- 查看每小時天氣預報
+- 查看未來天氣預報
+
+## 使用技術
+
+- 前端 : [vue](https://vuejs.org/) [tailwindcss](https://tailwindcss.com/) 
+- 開發環境 : [vite](https://vitejs.dev/) eslint prettier
+- API資料來源 : [氣象資料開放平台](https://opendata.cwa.gov.tw/index) [accuweather](https://developer.accuweather.com/) 
